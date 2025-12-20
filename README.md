@@ -163,22 +163,6 @@ void loop() {
 }
 ```
 
-## Wiring Diagram
-
-```
-CLK ──┬─→ All modules (clock signal)
-      │
-PC ───┼─→ MAR ──(Hardware)──→ RAM
-      │
-IR ───┼──(Hardware)──→ CTR
-      │
-A ────┼─→ ALU ←──┬── B
-      │          │
-      └─→ busSerial ←──┴─→ OUT → DISPLAY
-                │
-                └─→ ctrSerial (all modules)
-```
-
 ## Features
 
 - **True hardware implementation**: Each component is a physical Arduino board
