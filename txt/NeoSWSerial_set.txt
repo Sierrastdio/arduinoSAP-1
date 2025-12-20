@@ -1,0 +1,3 @@
+busSerial  D5(RX)  D6(TX)
+ctrSerial  D3(RX)  D4(TX)
+bSerial    D7(RX)  D8(TX)

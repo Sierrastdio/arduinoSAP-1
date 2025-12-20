@@ -1,2 +1,1 @@
-## License
-This project has no license. All rights reserved.
+## Arduino SAP-1 Computer 
