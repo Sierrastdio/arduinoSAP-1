@@ -5,9 +5,9 @@ Controller line:
 CTR D4 <- (PC, MAR, RAM, IR, A, ALU, B, OUT) D3
 
 Bus line:
-  PC D6 - MAR D5 - IR D6 
-  RAM D6 - A D5 - ALU D6 - B D5
-  A D6 - OUT D5
+  line1: PC D6 - MAR D5 - IR D6 
+  line2: RAM D6 - A D5 - ALU D6 - B D5
+  line3: A D6 - OUT D5
 
 A-ALU-B part:
   A D10 - ALU D9
@@ -19,6 +19,3 @@ HardwareSerial:
 
   MAR D0 <- RAM D1
   MAR D1 <- RAM D0
-
-  OUT D0 <- Display D1
-  Display D1 <- OUT D0
