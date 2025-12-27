@@ -103,7 +103,6 @@ These connections operate continuously at 19200 baud, allowing the RAM and CTR m
 
 - All data transmissions use **binary format** (`0b` prefix)
 - Both 8-bit and 4-bit data are transmitted in binary
-- **Hexadecimal format is never used**
 
 ### Synchronization
 
@@ -113,11 +112,11 @@ These connections operate continuously at 19200 baud, allowing the RAM and CTR m
 
 ## Hardware Requirements
 
-- 11x Arduino Uno boards
+- 10x Arduino Uno boards
 - Multiple breadboards for circuit organization
 - Jumper wires for serial connections
 - Power supply capable of powering all boards
-- LEDs and resistors for visual output (optional)
+- 16x2 lcd(I2C) for display output
 
 ## Software Requirements
 
@@ -162,14 +161,6 @@ void loop() {
   // Transmit data when required
 }
 ```
-
-## Features
-
-- **True hardware implementation**: Each component is a physical Arduino board
-- **Serial bus communication**: Mimics real computer bus architecture
-- **Clock-synchronized operation**: Demonstrates timing and sequencing
-- **Modular design**: Easy to understand and modify individual components
-
 ## Learning Objectives
 
 This project demonstrates:
@@ -184,7 +175,7 @@ This project demonstrates:
 ## Limitations
 
 - Limited instruction set (LDA, LDB, ADD+OUT)
-- 4-bit memory addressing (16 memory locations)
+- 4-bit memory addressing
 - 8-bit data width
 - Single ALU operation (addition)
 
