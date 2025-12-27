@@ -1,5 +1,5 @@
 /*
- * Output Register
+ * Output Register and 16x2 lcd(I2C)
  */
 #include <NeoSWSerial.h>
 #include <Wire.h>
