@@ -1,8 +1,10 @@
 # SAP-1 Computer Implementation using Arduino
-![](https://github.com/Sierrastdio/arduinoSAP-1/blob/main/Images/SAP-1_Architecture.PNG)    
+![](https://github.com/Sierrastdio/arduinoSAP-1/blob/main/Images/arduinoSAP-1.jpg)    
+    
 A hardware implementation of the SAP-1 (Simple As Possible) computer architecture using 11 Arduino Uno boards, demonstrating fundamental computer architecture concepts through physical serial communication.
 
 ## Project Overview
+![](https://github.com/Sierrastdio/arduinoSAP-1/blob/main/Images/SAP-1_Architecture.PNG)    
 
 This project implements a complete SAP-1 computer system where each major component is realized as a separate Arduino board. The boards communicate via serial connections to simulate the data and control buses of a real computer system.
 
