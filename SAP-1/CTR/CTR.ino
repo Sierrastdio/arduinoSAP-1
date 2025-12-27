@@ -1,6 +1,6 @@
 #include <NeoSWSerial.h>
 
-int CLKpin = 2; 
+int CLKpin = 2;  
 int TXC = 4;
 int RXC = 3;
 
