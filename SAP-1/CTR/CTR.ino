@@ -1,56 +1,51 @@
-/*
- * CTR: 클럭 상승엣지를 감지하고
- * 각 스텝에 맞는 8비트 제어 코드를 전송한다.
- */
 #include <NeoSWSerial.h>
 
-#define CLK_PIN 2
-#define RXC 3
-#define TXC 4
+int CLKpin = 2; 
+int TXC = 4;
+int RXC = 3;
 
-NeoSWSerial ctrSerial(RXC, TXC);
+const byte PC_CLEAR       = 0b00000000;
+const byte PC_INC         = 0b00000001; 
+const byte PC_to_MAR      = 0b00000010;
+const byte MAR_to_RAM     = 0b00000011;
+const byte RAM_to_IR      = 0b00000100;
+const byte IR_to_MAR      = 0b00000101;
+const byte RAM_to_A       = 0b00000110;
+const byte RAM_to_B       = 0b00000111;
+const byte ALU_ADD        = 0b00001001;
+const byte A_to_OUT       = 0b00001011;
+const byte ALU_to_A       = 0b00001100;
+const byte A_to_ALU       = 0b00011000;
+const byte B_to_ALU       = 0b00011100;
 
-#define CMD_PC_CLEAR              0b00000000
-#define CMD_PC_INC                0b00000001
-#define CMD_PC_TO_MAR             0b00000010
-#define CMD_MAR_TO_RAM            0b00000011
-#define CMD_RAM_TO_IR             0b00000100
-#define CMD_IR_TO_MAR             0b00000101
-#define CMD_RAM_TO_A              0b00000110
-#define CMD_RAM_TO_B              0b00000111
-#define CMD_ALU_ADD               0b00001001
-#define CMD_A_TO_OUT              0b00001011
-#define CMD_ALU_TO_A              0b00001100
-#define CMD_A_TO_ALU              0b00011000
-#define CMD_B_TO_ALU              0b00011100
-
-#define CYCLE_LDA 0b0001
-#define CYCLE_LDB 0b0010
-#define CYCLE_ADD 0b0011
+const byte CYCLE_LDA = 0b0001;
+const byte CYCLE_LDB = 0b0010;
+const byte CYCLE_ADD = 0b0011;
 
 byte stp = 0;
 bool lastCLK = LOW;
 byte currentCycle = CYCLE_LDA;
-byte nextCycle = CYCLE_LDA;
+byte nextInputOP = CYCLE_LDA;
+
+NeoSWSerial ctrSerial(RXC, TXC);
 
 void setup() {
   Serial.begin(19200);
-  pinMode(CLK_PIN, INPUT);
+  ctrSerial.begin(19200);
+  pinMode(CLKpin, INPUT);
   pinMode(TXC, INPUT);
   pinMode(13, OUTPUT);
   pinMode(0, INPUT);
   digitalWrite(13, LOW);
-
-  ctrSerial.begin(19200);
   
   delay(100);
-  lastCLK = digitalRead(CLK_PIN);
+  lastCLK = digitalRead(CLKpin);
 }
 
 void loop() {
   if (Serial.available()) {
     byte opcode = Serial.read();
-    nextCycle = (opcode >> 4) & 0b00001111;
+    nextInputOP = (opcode >> 4) & 0b00001111;
     
     if(opcode == 0b0011){
       digitalWrite(13, HIGH);
@@ -59,7 +54,7 @@ void loop() {
     }
   }
   
-  bool currentCLK = digitalRead(CLK_PIN);
+  bool currentCLK = digitalRead(CLKpin);
   if (lastCLK == LOW && currentCLK == HIGH) {
     stp++;
     bool isCycleComplete = false;
@@ -75,10 +70,9 @@ void loop() {
         isCycleComplete = ADDcycle(stp);
         break;
     }
-
     if (isCycleComplete) {
       stp = 0;
-      currentCycle = nextCycle;
+      currentCycle = nextInputOP;
     }
   }
   lastCLK = currentCLK;
@@ -86,13 +80,13 @@ void loop() {
 
 bool LDAcycle(byte step) {
   switch (step) {
-    case 1: sendCommand(CMD_PC_TO_MAR); break;
-    case 2: sendCommand(CMD_PC_INC); break;
-    case 3: sendCommand(CMD_RAM_TO_IR); break;        //case5와 case6 사이에 옵코드 전송이 있음.
-    case 4: sendCommand(CMD_IR_TO_MAR); break;
-    case 5: sendCommand(CMD_MAR_TO_RAM); break;
-    case 6: sendCommand(CMD_RAM_TO_A); break;         // 마지막 명령 실행
-    case 7: return true;                               // idle 클럭 후 사이클 완료
+    case 1: sendCommand(PC_to_MAR); break;
+    case 2: sendCommand(PC_INC); break;
+    case 3: sendCommand(RAM_to_IR); break;        //case5와 case6 사이에 옵코드 전송이 있음.
+    case 4: sendCommand(IR_to_MAR); break;
+    case 5: sendCommand(MAR_to_RAM); break;
+    case 6: sendCommand(RAM_to_A); break;         // 마지막 명령 실행
+    case 7: return true;                           // idle 클럭 후 사이클 완료
     default: break;
   }
   return false;
@@ -100,13 +94,13 @@ bool LDAcycle(byte step) {
 
 bool LDBcycle(byte step) {
   switch (step) {
-    case 1: sendCommand(CMD_PC_TO_MAR); break;
-    case 2: sendCommand(CMD_PC_INC); break;
-    case 3: sendCommand(CMD_RAM_TO_IR); break;      //case4와 case5 사이
-    case 4: sendCommand(CMD_IR_TO_MAR); break;      
-    case 5: sendCommand(CMD_MAR_TO_RAM); break;
-    case 6: sendCommand(CMD_RAM_TO_B); break;        // 마지막 명령 실행
-    case 7: return true;                             // idle 클럭 후 사이클 완료
+    case 1: sendCommand(PC_to_MAR); break;
+    case 2: sendCommand(PC_INC); break;
+    case 3: sendCommand(RAM_to_IR); break;      //case4와 case5 사이
+    case 4: sendCommand(IR_to_MAR); break;      
+    case 5: sendCommand(MAR_to_RAM); break;
+    case 6: sendCommand(RAM_to_B); break;        // 마지막 명령 실행
+    case 7: return true;                         // idle 클럭 후 사이클 완료
     default: break;
   }
   return false;
@@ -114,15 +108,15 @@ bool LDBcycle(byte step) {
 
 bool ADDcycle(byte step) {
   switch (step) {
-    case 1: sendCommand(CMD_A_TO_ALU); break;
-    case 2: sendCommand(CMD_B_TO_ALU); break;
-    case 3: sendCommand(CMD_ALU_ADD); break;
-    case 4: sendCommand(CMD_ALU_TO_A); break;
-    case 5: sendCommand(CMD_PC_TO_MAR); break;
-    case 7: sendCommand(CMD_PC_INC); break;
-    case 8: sendCommand(CMD_RAM_TO_IR); break;
-    case 9: sendCommand(CMD_A_TO_OUT); break;       // 마지막 명령 실행
-    case 10: return true;                             // idle 클럭 후 사이클 완료
+    case 1: sendCommand(A_to_ALU); break;
+    case 2: sendCommand(B_to_ALU); break;
+    case 3: sendCommand(ALU_ADD); break;
+    case 4: sendCommand(ALU_to_A); break;
+    case 5: sendCommand(PC_to_MAR); break;
+    case 6: sendCommand(PC_INC); break;
+    case 7: sendCommand(RAM_to_IR); break;
+    case 8: sendCommand(A_to_OUT); break;       // 마지막 명령 실행
+    case 9: return true;                         // idle 클럭 후 사이클 완료
     default: break;
   }
   return false;
