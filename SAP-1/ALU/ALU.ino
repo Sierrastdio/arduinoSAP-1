@@ -1,22 +1,20 @@
 /*
- * ALU: 산술 논리 연산 장치
+ * ALU(Adder) (dont have sub cal.)
  */
 #include <NeoSWSerial.h>
 
-// 핀 정의
-#define RXC 3
-#define TXC 4
-#define RXB 7
-#define TXB 8
+int RXC = 3;
+int TXC = 4;
+int RXB = 7;
+int TXB = 8;
 
 NeoSWSerial ctrSerial(RXC, TXC);
 NeoSWSerial bSerial(RXB, TXB);
 
-// 명령어 정의
-#define CMD_A_TO_ALU   0b00011000
-#define CMD_B_TO_ALU   0b00011100
-#define CMD_ALU_ADD    0b00001001
-#define CMD_ALU_TO_A   0b00001100
+const byte CMD_A_TO_ALU   0b00011000;
+const byte CMD_B_TO_ALU   0b00011100;
+const byte CMD_ALU_ADD    0b00001001;
+const byte CMD_ALU_TO_A   0b00001100;
 
 byte aluA = 0b00000000;
 byte aluB = 0b00000000;

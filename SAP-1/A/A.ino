@@ -1,20 +1,20 @@
 /*
- * A: 누산기
+ *  A Register
  */
 #include <NeoSWSerial.h>
 
-#define RXB 5
-#define TXB 6
-#define RXC 3
-#define TXC 4
+int RXB = 5;
+int TXB = 6;
+int RXC = 3;
+int TXC = 4;
 
 NeoSWSerial busSerial(RXB, TXB);
 NeoSWSerial ctrSerial(RXC, TXC);
 
-#define CMD_RAM_TO_A   0b00000110
-#define CMD_A_TO_ALU   0b00011000
-#define CMD_ALU_TO_A   0b00001100
-#define CMD_A_TO_OUT   0b00001011
+const byte CMD_RAM_TO_A   0b00000110;
+const byte CMD_A_TO_ALU   0b00011000;
+const byte CMD_ALU_TO_A   0b00001100;
+const byte CMD_A_TO_OUT   0b00001011;
 
 byte aValue = 0b00000000;
 

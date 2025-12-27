@@ -1,21 +1,21 @@
 /*
- * B: B 레지스터
+ * B Register
  */
 #include <NeoSWSerial.h>
 
-#define RXB 5
-#define TXB 6
-#define RXC 3
-#define TXC 4
-#define RXA 7
-#define TXA 8
+int RXB = 5;
+int TXB = 6;
+int RXC = 3;
+int TXC = 4;
+int RXA = 7;
+int TXA = 8;
 
 NeoSWSerial busSerial(RXB, TXB);
 NeoSWSerial ctrSerial(RXC, TXC);
 NeoSWSerial bSerial(RXA, TXA);
 
-#define CMD_RAM_TO_B   0b00000111
-#define CMD_B_TO_ALU   0b00011100
+const byte CMD_RAM_TO_B   0b00000111;
+const byte CMD_B_TO_ALU   0b00011100;
 
 byte bValue = 0b00000000;
 

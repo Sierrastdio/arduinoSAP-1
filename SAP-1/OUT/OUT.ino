@@ -1,18 +1,21 @@
+/*
+ * Output Register
+ */
 #include <NeoSWSerial.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
-#define RXC 3   
-#define TXC 4
-#define RXB 5
-#define TXB 6
+int RXC = 3;  
+int TXC = 4;
+int RXB = 5;
+int TXB = 6;
 
 NeoSWSerial ctrSerial(RXC, TXC);
 NeoSWSerial busSerial(RXB, TXB);
 
 LiquidCrystal_I2C lcd(0x3F, 16, 2);
 
-#define CMD_A_TO_OUT  0b00001011
+const byte CMD_A_TO_OUT  0b00001011;
 
 byte outValue = 0b00000000;
 

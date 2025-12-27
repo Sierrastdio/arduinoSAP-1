@@ -1,18 +1,18 @@
 /*
- * IR: 명령어 레지스터
+ * Instruction Register
  */
 #include <NeoSWSerial.h>
 
-#define RXB 5
-#define TXB 6
-#define RXC 3
-#define TXC 4
+int RXB = 5;
+int TXB = 6;
+int RXC = 3;
+int TXC = 4;
 
 NeoSWSerial busSerial(RXB, TXB);
 NeoSWSerial ctrSerial(RXC, TXC);
 
-#define CMD_RAM_TO_IR 0b00000100
-#define CMD_IR_TO_MAR 0b00000101
+const byte CMD_RAM_TO_IR 0b00000100;
+const byte CMD_IR_TO_MAR 0b00000101;
 
 byte instruction = 0b00000000;
 byte opcode = 0b00000000;
@@ -79,10 +79,6 @@ void receiveFromBus() {
       opcode = (instruction >> 4) & 0b00001111;
       address = instruction & 0b00001111;
       
-      //digitalWrite(13, HIGH);
-      //delay(200);
-      //digitalWrite(13, LOW);
-      
       // CMD_RAM_TO_IR 받을 때마다 무조건 CTR에 전송
       sendOpcodeToCTR();
       lastInstruction = instruction;
@@ -113,21 +109,11 @@ void sendToMAR() {
   delay(5);
   pinMode(TXB, INPUT);
   
-  //digitalWrite(13, HIGH);
-  //delay(200);
-  //digitalWrite(13, LOW);
-  
   ctrSerial.listen();
 }
 
 void sendOpcodeToCTR() {
   byte dataToSend = (opcode << 4);
-
-  //if(opcode == 0b0011)
-  //{
-    //digitalWrite(13, HIGH);
-  //}
-  
   Serial.write(dataToSend);
   Serial.flush();
 }

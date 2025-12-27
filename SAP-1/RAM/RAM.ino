@@ -1,12 +1,12 @@
 /*
- * RAM: 메모리
+ * Random Access Memory
  */
 #include <NeoSWSerial.h>
 
-#define RXC 3
-#define TXC 4
-#define RXB 5
-#define TXB 6
+int RXC = 3;
+int TXC = 4;
+int RXB = 5;
+int TXB = 6;
 
 NeoSWSerial busSerial(RXB, TXB);
 NeoSWSerial ctrSerial(RXC, TXC);
@@ -30,9 +30,9 @@ byte ramMemory[16] = {  // 현재 LDA->LDB->ADD 실행구조 구현중. LDA는 �
   0b00000000
 };      //즉 현재 목표는 LDB에서 ADD로 전환하는 것이다. 
 
-#define CMD_RAM_TO_IR   0b00000100
-#define CMD_RAM_TO_A    0b00000110
-#define CMD_RAM_TO_B    0b00000111
+const byte CMD_RAM_TO_IR   0b00000100;
+const byte CMD_RAM_TO_A    0b00000110;
+const byte CMD_RAM_TO_B    0b00000111;
 
 byte dataToSend = 0b00000000;
 

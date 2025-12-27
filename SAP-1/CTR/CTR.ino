@@ -1,3 +1,6 @@
+/*
+ * Controller&Sequensor
+ */
 #include <NeoSWSerial.h>
 
 int CLKpin = 2;  

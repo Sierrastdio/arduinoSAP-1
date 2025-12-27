@@ -1,18 +1,18 @@
 /*
- * MAR: 메모리 주소 레지스터 (수정본)
+ * Memory Address Regiser
  */
 #include <NeoSWSerial.h>
 
-#define RXC 3
-#define TXC 4
-#define RXB 5
-#define TXB 6
+int RXC = 3;
+int TXC = 4;
+int RXB = 5;
+int TXB = 6;
 
 NeoSWSerial busSerial(RXB, TXB);
 NeoSWSerial ctrSerial(RXC, TXC);
 
-#define CMD_PC_TO_MAR         0b00000010
-#define CMD_IR_TO_MAR         0b00000101
+const byte CMD_PC_TO_MAR         0b00000010;
+const byte CMD_IR_TO_MAR         0b00000101;
 
 byte marValue = 0b00000000;
 
