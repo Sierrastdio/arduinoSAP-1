@@ -1,11 +1,29 @@
-/*
- * Controller&Sequensor
- */
 #include <NeoSWSerial.h>
+#include <avr/io.h>
+#include <util/delay.h>
 
-int CLKpin = 2;  
-int TXC = 4;
-int RXC = 3;
+#define CLKpin PD2
+
+#define TXC PD4     //TX_Command
+#define RXC PD3     //RX_Command
+
+#define S_SERIAL_HIGH_Z \
+    DDRD  &= ~((1 << TXC) | (1 << RXC)); \
+    PORTD &= ~((1 << TXC) | (1 << RXC));
+
+#define S_SERIAL_OUTPUT \
+    DDRD  |= ((1 << TXC) | (1 << RXC)); \
+    PORTD &= ~((1 << TXC) | (1 << RXC));
+
+#define H_SERIAL_HIGH_Z \
+    DDRD  &= ~((1 << PD1) | (1 << PD0)); \
+    PORTD &= ~((1 << PD1) | (1 << PD0));
+
+#define H_SERIAL_OUTPUT \
+    DDRD  |= ((1 << PD1) | (1 << PD0)); \
+    PORTD &= ~((1 << PD1) | (1 << PD0));
+
+
 
 #define PC_CLEAR        0b00000000
 #define PC_INC          0b00000001
@@ -19,11 +37,15 @@ int RXC = 3;
 #define A_to_OUT        0b00001011
 #define ALU_to_A        0b00001100
 #define A_to_ALU        0b00011000
-#define B_to_ALU   0b00011100
+#define B_to_ALU        0b00011100
 
 #define CYCLE_LDA  0b0001
 #define CYCLE_LDB  0b0010
 #define CYCLE_ADD  0b0011
+
+#define LED_OUTPUT DDRB |= (1 << 5);
+#define LED_HIGH  PORTB |= (1 << 5);
+#define LED_LOW   PORTB &= ~(1 << 5);
 
 byte stp = 0;
 bool lastCLK = LOW;
@@ -35,33 +57,32 @@ NeoSWSerial ctrSerial(RXC, TXC);
 void setup() {
   Serial.begin(19200);
   ctrSerial.begin(19200);
-  pinMode(CLKpin, INPUT);
-  pinMode(TXC, INPUT);
-  pinMode(13, OUTPUT);
-  pinMode(0, INPUT);
-  digitalWrite(13, LOW);
-  
-  delay(100);
-  lastCLK = digitalRead(CLKpin);
+
+  DDRD &= ~(1 << CLKpin);
+  S_SERIAL_HIGH_Z();
+  LED_OUTPUT();
+
+  _delay_ms(100);
+  lastCLK = PIND & (1 << CLKpin);
 }
 
 void loop() {
   if (Serial.available()) {
     byte opcode = Serial.read();
     nextInputOP = (opcode >> 4) & 0b00001111;
-    
+
     if(opcode == 0b0011){
-      digitalWrite(13, HIGH);
-      delay(100);
-      digitalWrite(13, LOW);
+      LED_HIGH();
+      _delay_ms(100);
+      LED_LOW();
     }
   }
-  
-  bool currentCLK = digitalRead(CLKpin);
+
+  bool currentCLK = PIND & (1 << CLKpin);
   if (lastCLK == LOW && currentCLK == HIGH) {
     stp++;
     bool isCycleComplete = false;
-    
+
     switch(currentCycle) {
       case CYCLE_LDA:
         isCycleComplete = LDAcycle(stp);
@@ -100,7 +121,7 @@ bool LDBcycle(byte step) {
     case 1: sendCommand(PC_to_MAR); break;
     case 2: sendCommand(PC_INC); break;
     case 3: sendCommand(RAM_to_IR); break;      //case4와 case5 사이
-    case 4: sendCommand(IR_to_MAR); break;      
+    case 4: sendCommand(IR_to_MAR); break;
     case 5: sendCommand(MAR_to_RAM); break;
     case 6: sendCommand(RAM_to_B); break;        // 마지막 명령 실행
     case 7: return true;                         // idle 클럭 후 사이클 완료
@@ -126,19 +147,18 @@ bool ADDcycle(byte step) {
 }
 
 void sendCommand(byte cmd) {
-  pinMode(TXC, OUTPUT);
-  digitalWrite(TXC, LOW);
-  delay(5);
-  
-  ctrSerial.listen();
-  delay(10);
-  
+  S_SERIAL_OUTPUT();
+
+  //_delay_ms(5);
+
+  //ctrSerial.listen();
+  _delay_ms(10);
+
   ctrSerial.write(cmd);
   ctrSerial.flush();
-  
-  delay(15);
-  
-  digitalWrite(TXC, LOW);
-  delay(5);
-  pinMode(TXC, INPUT);
+
+  _delay_ms(15);
+
+  S_SERIAL_HIGH_Z();
+  _delay_ms(5);
 }
