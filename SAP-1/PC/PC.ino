@@ -16,8 +16,8 @@
     PORTB &= ~((1 << TXB) | (1 << RXB));
 
 #define SC_SERIAL_HIGH_Z \
-    DDRC  &= ~((1 << )); \
-    PORTC &= ~((1 << ));
+    DDRD  &= ~((1 << TXC) | (1 << RXC)); \
+    PORTD &= ~((1 << TXC) | (1 << RXC));
 
 #define SC_SERIAL_OUTPUT \
     DDRC  |= ((1 << TXC) | (1 << RXC)); \
@@ -40,11 +40,11 @@ void setup() {
   busSerial.begin(19200);
   ctrSerial.begin(19200);
 
-  SB_SERIAL_HIGH_Z();
-  LED_OUTPUT();
+  SB_SERIAL_HIGH_Z;
+  LED_OUTPUT;
 
   ctrSerial.listen();
-  LED_LOW();
+  LED_LOW;
 }
 
 void loop() {
@@ -53,25 +53,25 @@ void loop() {
 
     if (cmd == CMD_PC_INC) {
       pcValue++;
-      LED_HIGH();
+      LED_HIGH;
       _delay_ms(200);
-      LED_LOW();
+      LED_LOW;
     }
     else if (cmd == CMD_PC_TO_MAR) {
-      SB_SERIAL_OUTPUT();
+      SB_SERIAL_OUTPUT;
       _delay_ms(10);
 
       busSerial.write(pcValue);
       busSerial.flush();
       _delay_ms(10);
 
-      SB_SERIAL_HIGH_Z();
+      SB_SERIAL_HIGH_Z;
       ctrSerial.listen();
 
       if(pcValue == 0b0001) {
-        LED_HIGH();
+        LED_HIGH;
         _delay_ms(100);
-        LED_LOW();
+        LED_LOW;
       }
     }
   }
