@@ -3,7 +3,7 @@
 
 
 #define CLK_PIN 2
-#define clkDelay 101
+#define CLKdelay 101
 
 #define LED_OUTPUT DDRB |= (1 << 5);
 #define LED_HIGH  PORTB |= (1 << 5);
@@ -22,9 +22,9 @@ void setup() {
 void loop() {
   CLK_HIGH();
   LED_HIGH();
-  _delay_ms(clkDelay);
+  _delay_ms(CLKdelay);
 
   CLK_LOW();
   LED_LOW();
-  _delay_ms(clkDelay);
+  _delay_ms(CLKdelay);
 }

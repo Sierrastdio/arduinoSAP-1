@@ -33,8 +33,6 @@
     DDRD  |= ((1 << PD1) | (1 << PD0)); \
     PORTD &= ~((1 << PD1) | (1 << PD0));
 
-
-
 #define LED_OUTPUT DDRB |= (1 << 5);
 #define LED_HIGH  PORTB |= (1 << 5);
 #define LED_LOW   PORTB &= ~(1 << 5);

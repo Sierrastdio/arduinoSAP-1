@@ -31,8 +31,8 @@ NeoSWSerial bSerial(RXB, TXB);
     PORTD &= ~((1 << TXC) | (1 << RXC));
 
 #define SC_SERIAL_OUTPUT \
-    DDRC  |= ((1 << TXC) | (1 << RXC)); \
-    PORTC &= ~((1 << TXC) | (1 << RXC));
+    DDRD  |= ((1 << TXC) | (1 << RXC)); \
+    PORTD &= ~((1 << TXC) | (1 << RXC));
 
 #define H_SERIAL_HIGH_Z \
     DDRD  &= ~((1 << PD1) | (1 << PD0)); \

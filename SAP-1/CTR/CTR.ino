@@ -1,3 +1,7 @@
+/*
+ * CTR: Controller & Sequencer
+ */
+
 #include <NeoSWSerial.h>
 #include <avr/io.h>
 #include <util/delay.h>

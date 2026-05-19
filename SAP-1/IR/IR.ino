@@ -1,18 +1,50 @@
 /*
- * Instruction Register
+ * IR: Instruction Register
  */
+#include <avr/io.h>
+#include <util/delay.h>
 #include <NeoSWSerial.h>
 
-int RXB = 5;
-int TXB = 6;
-int RXC = 3;
-int TXC = 4;
+#define RXB PD5
+#define TXB PD6
+#define RXC PD3
+#define TXC PD4
 
 NeoSWSerial busSerial(RXB, TXB);
 NeoSWSerial ctrSerial(RXC, TXC);
 
-const byte CMD_RAM_TO_IR 0b00000100;
-const byte CMD_IR_TO_MAR 0b00000101;
+#define SB_SERIAL_HIGH_Z \
+    DDRB  &= ~((1 << TXB) | (1 << RXB)); \
+    PORTB &= ~((1 << TXB) | (1 << RXB));
+
+#define SB_SERIAL_OUTPUT \
+    DDRD  |= ((1 << TXB) | (1 << RXB)); \
+    PORTD &= ~((1 << TXB) | (1 << RXB));
+
+#define SB_SERIAL_TXB_LOW PORTD &= ~(1 << TXB);
+
+#define SC_SERIAL_HIGH_Z \
+    DDRD  &= ~((1 << TXC) | (1 << RXC)); \
+    PORTD &= ~((1 << TXC) | (1 << RXC));
+
+#define SC_SERIAL_OUTPUT \
+    DDRD  |= ((1 << TXC) | (1 << RXC)); \
+    PORTD &= ~((1 << TXC) | (1 << RXC));
+
+#define H_SERIAL_HIGH_Z \
+    DDRD  &= ~((1 << PD1) | (1 << PD0)); \
+    PORTD &= ~((1 << PD1) | (1 << PD0));
+
+#define H_SERIAL_OUTPUT \
+    DDRD  |= ((1 << PD1) | (1 << PD0)); \
+    PORTD &= ~((1 << PD1) | (1 << PD0));
+
+#define LED_OUTPUT DDRB |= (1 << 5);
+#define LED_HIGH  PORTB |= (1 << 5);
+#define LED_LOW   PORTB &= ~(1 << 5);
+
+#define CMD_RAM_TO_IR 0b00000100
+#define CMD_IR_TO_MAR 0b00000101
 
 byte instruction = 0b00000000;
 byte opcode = 0b00000000;
@@ -23,14 +55,13 @@ void setup() {
   Serial.begin(19200);
   busSerial.begin(19200);
   ctrSerial.begin(19200);
-  
-  pinMode(13, OUTPUT);
-  pinMode(TXB, INPUT);
-  pinMode(TXC, INPUT);
-  pinMode(RXB, INPUT);
-  pinMode(1, INPUT);
-  
-  digitalWrite(13, LOW);
+
+  LED_OUTPUT;
+  SB_SERIAL_HIGH_Z;
+  SC_SERIAL_HIGH_Z;
+  H_SERIAL_HIGH_Z;
+
+  LED_LOW;
   ctrSerial.listen();
 }
 
@@ -40,7 +71,7 @@ void loop() {
     sendOpcodeToCTR();
     lastInstruction = instruction;
   }
-  
+
   if (ctrSerial.available()) {
     handleCommand(ctrSerial.read());
   }
@@ -51,11 +82,11 @@ void handleCommand(byte cmd) {
     case CMD_RAM_TO_IR:
       receiveFromBus();
       break;
-      
+
     case CMD_IR_TO_MAR:
       sendToMAR();
       break;
-      
+
     default:
       ctrSerial.listen();
       break;
@@ -66,49 +97,49 @@ void receiveFromBus() {
   while(busSerial.available()) {
     busSerial.read();
   }
-  
+
   busSerial.listen();
-  
+
   for(int i = 0; i < 300; i++) {
     if (busSerial.available()) {
       instruction = busSerial.read();
       if(instruction == 0b00111101){
-        digitalWrite(13, HIGH);
+        LED_HIGH;
       }
-      
+
       opcode = (instruction >> 4) & 0b00001111;
       address = instruction & 0b00001111;
-      
+
       // CMD_RAM_TO_IR 받을 때마다 무조건 CTR에 전송
       sendOpcodeToCTR();
       lastInstruction = instruction;
-      
+
       ctrSerial.listen();
       return;
     }
-    delay(10);
+    _delay_ms(10);
   }
-  
+
   ctrSerial.listen();
 }
 
 void sendToMAR() {
-  pinMode(TXB, OUTPUT);
-  digitalWrite(TXB, LOW);
-  delay(50);
-  
+  SB_SERIAL_OUTPUT;
+  SB_SERIAL_LOW;
+  _delay_ms(50);
+
   busSerial.listen();
-  delay(10);
-  
+  _delay_ms(10);
+
   busSerial.write(address);
   busSerial.flush();
-  
-  delay(15);
-  
-  digitalWrite(TXB, LOW);
-  delay(5);
-  pinMode(TXB, INPUT);
-  
+
+  _delay_ms(15);
+
+  SB_SERIAL_LOW;
+  _delay_ms(5);
+  SB_SERIAL_HIGH_Z;
+
   ctrSerial.listen();
 }
 
